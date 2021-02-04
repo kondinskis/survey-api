@@ -67,3 +67,8 @@ class UserService:
     @staticmethod
     def get_all():
         return User.query.all()
+
+    @staticmethod
+    def get_by_email(email):
+        user = User.query.filter_by(email=email).one_or_none()
+        return user
