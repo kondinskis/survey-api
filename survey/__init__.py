@@ -15,4 +15,6 @@ def create_app(config=Config):
     api.add_namespace(role_ns)
     api.add_namespace(user_ns)
 
+    import survey.errors
+
     return app

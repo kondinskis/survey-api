@@ -18,9 +18,12 @@ class Base(db.Model):
             except Exception as e:
                 db.session.rollback()
                 raise e
+        return self
 
     def update(self, *args, **kwargs):
+        self.updated_at = datetime.now(timezone.utc)
         db.session.commit()
+        return self
 
     def delete(self, commit=True):
         db.session.delete(self)
