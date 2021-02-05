@@ -18,7 +18,7 @@ class Survey(Resource):
 
     @jwt_required
     def delete(self, id):
-        SurveyService.delete(id)
+        SurveyService.delete(id), 204
 
     @ns.marshal_with(schema)
     @jwt_required

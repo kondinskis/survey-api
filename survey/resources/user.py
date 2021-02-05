@@ -18,7 +18,7 @@ class User(Resource):
 
     @jwt_required
     def delete(self, id):
-        UserService.delete(id)
+        UserService.delete(id), 204
 
     @ns.marshal_with(schema)
     @jwt_required

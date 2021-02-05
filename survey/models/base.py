@@ -18,14 +18,24 @@ class Base(db.Model):
             except Exception as e:
                 db.session.rollback()
                 raise e
+        else:
+            db.session.flush()
         return self
 
-    def update(self, *args, **kwargs):
-        self.updated_at = datetime.now(timezone.utc)
-        db.session.commit()
+    def update(self, commit=True):
+        if commit:
+            db.session.commit()
         return self
 
     def delete(self, commit=True):
         db.session.delete(self)
         if commit:
             db.session.commit()
+        else:
+            db.session.flush()
+
+    def __eq__(self, other):
+        if not isinstance(other, Base):
+            # don't attempt to compare against unrelated types
+            return NotImplemented
+        return self.id == other.id

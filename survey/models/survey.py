@@ -12,3 +12,4 @@ class Survey(Base):
     description = db.Column(db.String(length=256))
     active_till = db.Column(db.DateTime())
     active_from = db.Column(db.DateTime())
+    questions = db.relationship("Question", backref="survey", cascade="all, delete, delete-orphan")

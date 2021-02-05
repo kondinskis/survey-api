@@ -1,4 +1,6 @@
 from werkzeug.exceptions import NotFound, BadRequest
+from datetime import datetime, timezone
+
 from survey.models.user import User
 from survey.models.role import Role
 
@@ -43,6 +45,7 @@ class UserService:
         saved_user.lastname = user.get("lastname")
         saved_user.email = user.get("email")
         saved_user.role = role
+        saved_user.updated_at = datetime.now(timezone.utc)
 
         password = user.get("password")
         if not password is None and password.strip():
@@ -55,7 +58,7 @@ class UserService:
         user = User.query.get(id)
         if user is None:
             raise NotFound(description=("User with id [{0}] not found".format(id)))
-        user.delete()
+        return user.delete()
 
     @staticmethod
     def get(id):
