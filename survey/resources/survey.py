@@ -9,7 +9,7 @@ from survey.schemas.survey import schema
 @ns.route("/<id>")
 @ns.param("id", "Survey unique identifier")
 class Survey(Resource):
-    @ns.marshal_with(schema)
+    @ns.marshal_with(schema, skip_none=True)
     @ns.expect(schema)
     @jwt_required
     def put(self, id):
@@ -20,7 +20,7 @@ class Survey(Resource):
     def delete(self, id):
         SurveyService.delete(id), 204
 
-    @ns.marshal_with(schema)
+    @ns.marshal_with(schema, skip_none=True)
     @jwt_required
     def get(self, id):
         survey = SurveyService.get(id)
@@ -29,13 +29,13 @@ class Survey(Resource):
 
 @ns.route("")
 class SurveyList(Resource):
-    @ns.marshal_list_with(schema)
+    @ns.marshal_list_with(schema, skip_none=True)
     @jwt_required
     def get(self):
         surveys = SurveyService.get_all()
         return surveys
 
-    @ns.marshal_with(schema)
+    @ns.marshal_with(schema, skip_none=True)
     @ns.expect(schema)
     @jwt_required
     def post(self):

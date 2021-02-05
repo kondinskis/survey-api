@@ -5,16 +5,19 @@ from survey.models.survey import Survey
 from survey.models.question import Question
 from survey.models.option import Option
 from survey.models.answer import Answer
+from survey.models.tag import Tag
 
 
 class SurveyService:
     @staticmethod
     def create(survey):
+        tags = Tag.query.filter(Tag.id.in_(survey.get("tag_ids") or [])).all()
         new_survey = Survey(
             title=survey.get("title"),
             description=survey.get("description"),
             active_till=survey.get("active_till"),
             active_from=survey.get("active_from"),
+            tags=tags,
         )
 
         new_survey = new_survey.save(commit=False)
@@ -38,7 +41,6 @@ class SurveyService:
                 new_option.save(commit=False)
 
         db.session.commit()
-
         return new_survey
 
     @staticmethod

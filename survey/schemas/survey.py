@@ -1,5 +1,6 @@
 from flask_restx import fields
 from survey.namespaces.survey import ns
+from .tag import schema as tag_schema
 
 option_schema = ns.model(
     "Survey option schema",
@@ -20,7 +21,7 @@ question_schema = ns.model(
         "order": fields.Integer(description="Question order"),
         "created_at": fields.DateTime(description="Date of creation"),
         "updated_at": fields.DateTime(description="Date of modification"),
-        "options": fields.Nested(option_schema, as_list=True),
+        "options": fields.Nested(option_schema, as_list=True, skip_none=True),
     },
 )
 
@@ -34,6 +35,8 @@ schema = ns.model(
         "active_from": fields.DateTime(description="Survey active from"),
         "created_at": fields.DateTime(description="Date of creation"),
         "updated_at": fields.DateTime(description="Date of modification"),
-        "questions": fields.Nested(question_schema, as_list=True),
+        "questions": fields.Nested(question_schema, as_list=True, skip_none=True),
+        "tag_ids": fields.List(fields.Integer),
+        "tags": fields.Nested(tag_schema, as_list=True, skip_none=True),
     },
 )

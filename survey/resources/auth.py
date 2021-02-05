@@ -32,7 +32,7 @@ def user_loader_callback(identity):
 
 @ns.route("/token")
 class AccessToken(Resource):
-    @ns.marshal_with(token_schema)
+    @ns.marshal_with(token_schema, skip_none=True)
     @ns.expect(token_request_schema)
     def post(self):
 
@@ -53,7 +53,7 @@ class AccessToken(Resource):
 
 @ns.route("/refresh")
 class RefreshToken(Resource):
-    @ns.marshal_with(token_schema)
+    @ns.marshal_with(token_schema, skip_none=True)
     @jwt_refresh_token_required
     def post(self):
         ret = {"access_token": create_access_token(identity=current_user)}

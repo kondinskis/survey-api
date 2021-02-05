@@ -6,6 +6,7 @@ from survey.resources.auth import ns as auth_ns
 from survey.resources.user import ns as user_ns
 from survey.resources.role import ns as role_ns
 from survey.resources.survey import ns as survey_ns
+from survey.resources.tag import ns as tag_ns
 
 
 def create_app(config=Config):
@@ -18,6 +19,7 @@ def create_app(config=Config):
     api.add_namespace(role_ns)
     api.add_namespace(user_ns)
     api.add_namespace(survey_ns)
+    api.add_namespace(tag_ns)
 
     import survey.errors
 

@@ -8,7 +8,7 @@ from survey.schemas.role import schema
 
 @ns.route("")
 class RoleList(Resource):
-    @ns.marshal_with(schema)
+    @ns.marshal_with(schema, skip_none=True)
     @jwt_required
     def get(self):
         return RoleService.get_all()
