@@ -45,8 +45,6 @@ class SurveyService:
 
     @staticmethod
     def update(id, survey):
-        print(survey)
-
         saved_survey = Survey.query.get(id)
         if saved_survey is None:
             raise NotFound(description=("Survey with id [{0}] not found".format(id)))
@@ -84,6 +82,9 @@ class SurveyService:
                 survey.get("questions") or [],
             )
         )
+        saved_survey.tags = Tag.query.filter(
+            Tag.id.in_(survey.get("tag_ids") or [])
+        ).all()
 
         saved_survey = saved_survey.update()
         return saved_survey
