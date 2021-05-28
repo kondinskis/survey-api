@@ -25,8 +25,8 @@ def user_identity_lookup(user):
 
 
 @jwt.user_lookup_loader
-def user_loader_callback(identity):
-    user = UserService.get_by_email(identity)
+def user_lookup_callback(_jwt_header, jwt_data):
+    user = UserService.get_by_email(jwt_data["sub"])
     return user
 
 

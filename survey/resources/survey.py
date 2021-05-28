@@ -11,17 +11,17 @@ from survey.schemas.survey import schema
 class Survey(Resource):
     @ns.marshal_with(schema, skip_none=True)
     @ns.expect(schema)
-    @jwt_required
+    @jwt_required()
     def put(self, id):
         survey = SurveyService.update(id, ns.payload)
         return survey
 
-    @jwt_required
+    @jwt_required()
     def delete(self, id):
         SurveyService.delete(id), 204
 
     @ns.marshal_with(schema, skip_none=True)
-    @jwt_required
+    @jwt_required()
     def get(self, id):
         survey = SurveyService.get(id)
         return survey
@@ -30,14 +30,15 @@ class Survey(Resource):
 @ns.route("")
 class SurveyList(Resource):
     @ns.marshal_list_with(schema, skip_none=True)
-    @jwt_required
+    @jwt_required()
     def get(self):
+        print("test")
         surveys = SurveyService.get_all()
         return surveys
 
     @ns.marshal_with(schema, skip_none=True)
     @ns.expect(schema)
-    @jwt_required
+    @jwt_required()
     def post(self):
         survey = SurveyService.create(ns.payload)
         return survey, 201
