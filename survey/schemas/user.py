@@ -11,6 +11,7 @@ schema = ns.model(
         "email": fields.String(required=True, description="User email"),
         "password": fields.String(description="Password"),
         "role_id": fields.Integer(required=True, description="Role unique id"),
+        "role": fields.Nested(role_schema),
         "created_at": fields.DateTime(description="Date of creation"),
         "updated_at": fields.DateTime(description="Date of modification"),
     },
