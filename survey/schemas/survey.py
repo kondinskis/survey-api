@@ -10,6 +10,7 @@ option_schema = ns.model(
         "order": fields.Integer(description="Option order"),
         "created_at": fields.DateTime(description="Date of creation"),
         "updated_at": fields.DateTime(description="Date of modification"),
+        "total": fields.Integer(description="Option choosen as answer"),
     },
 )
 
@@ -22,6 +23,17 @@ question_schema = ns.model(
         "created_at": fields.DateTime(description="Date of creation"),
         "updated_at": fields.DateTime(description="Date of modification"),
         "options": fields.Nested(option_schema, as_list=True, skip_none=True),
+    },
+)
+
+answer_schema = ns.model(
+    "Survey answers schema",
+    {
+        "answers": fields.Nested(
+            ns.model("Survey answer schema", {
+                "question_id": fields.Integer(description="Question unique id"),
+                "option_id": fields.Integer(description="Option unique id"),
+            }), as_list=True)
     },
 )
 

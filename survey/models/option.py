@@ -11,3 +11,4 @@ class Option(Base):
     option = db.Column(db.String(length=64))
     order = db.Column(db.Integer)
     question_id = db.Column(db.Integer, db.ForeignKey("question.id"))
+    total = 0

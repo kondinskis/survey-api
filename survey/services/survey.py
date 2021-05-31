@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 from werkzeug.exceptions import NotFound, BadRequest
+from sqlalchemy import func
 from survey.extensions import db
 from survey.models.survey import Survey
 from survey.models.question import Question
@@ -107,3 +108,40 @@ class SurveyService:
     @staticmethod
     def get_all():
         return Survey.query.all()
+
+    @staticmethod
+    def take(id, answers):
+        survey = Survey.query.get(id)
+        if survey is None:
+            raise NotFound(description=("Survey with id [{0}] not found".format(id)))
+
+        for answer in answers:
+            new_answer = Answer(
+                survey_id=id,
+                question_id=answer["question_id"],
+                option_id=answer["option_id"]
+            )
+            new_answer.save()
+
+    @staticmethod
+    def results(id):
+        survey = Survey.query.get(id)
+        if survey is None:
+            raise NotFound(description=("Survey with id [{0}] not found".format(id)))
+
+        results = db.session.query(Answer.question_id, Answer.option_id, func.count(Answer.option_id)) \
+            .filter_by(survey_id=id) \
+            .group_by(Answer.question_id, Answer.option_id).all()
+
+        for question in survey.questions:
+            for option in question.options:
+                def get_total():
+                    try:
+                        total = next(filter(lambda x: x[0] == question.id and x[1] == option.id, results))
+                        return total[2]
+                    except StopIteration:
+                        return 0
+
+                option.total = get_total()
+
+        return survey

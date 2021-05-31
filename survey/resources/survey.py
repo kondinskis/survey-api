@@ -3,7 +3,7 @@ from flask_jwt_extended import jwt_required, current_user
 
 from survey.namespaces.survey import ns
 from survey.services.survey import SurveyService
-from survey.schemas.survey import schema
+from survey.schemas.survey import schema, answer_schema
 
 
 @ns.route("/<id>")
@@ -32,7 +32,6 @@ class SurveyList(Resource):
     @ns.marshal_list_with(schema, skip_none=True)
     @jwt_required()
     def get(self):
-        print("test")
         surveys = SurveyService.get_all()
         return surveys
 
@@ -42,3 +41,20 @@ class SurveyList(Resource):
     def post(self):
         survey = SurveyService.create(ns.payload)
         return survey, 201
+
+
+@ns.route("/take/<id>")
+class TakeSurvey(Resource):
+    @ns.expect(answer_schema)
+    @jwt_required()
+    def post(self, id):
+        SurveyService.take(id, ns.payload["answers"])
+        return {}, 200
+
+
+@ns.route("/results/<id>")
+class SurveyResults(Resource):
+    @ns.marshal_with(schema)
+    @jwt_required()
+    def get(self, id):
+        return SurveyService.results(id)
