@@ -143,5 +143,6 @@ class SurveyService:
                         return 0
 
                 option.total = get_total()
+                question.total = question.total + option.total
 
         return survey

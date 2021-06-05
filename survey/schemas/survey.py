@@ -23,6 +23,7 @@ question_schema = ns.model(
         "created_at": fields.DateTime(description="Date of creation"),
         "updated_at": fields.DateTime(description="Date of modification"),
         "options": fields.Nested(option_schema, as_list=True, skip_none=True),
+        "total": fields.Integer(description="Total answers"),
     },
 )
 

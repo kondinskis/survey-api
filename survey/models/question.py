@@ -14,3 +14,4 @@ class Question(Base):
     options = db.relationship(
         "Option", backref="question", cascade="all, delete, delete-orphan"
     )
+    total = 0
