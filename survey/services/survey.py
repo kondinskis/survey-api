@@ -95,6 +95,7 @@ class SurveyService:
         survey = Survey.query.get(id)
         if survey is None:
             raise NotFound(description=("Survey with id [{0}] not found".format(id)))
+        Answer.query.filter(Answer.survey_id==id).delete()
         return survey.delete()
 
     @staticmethod

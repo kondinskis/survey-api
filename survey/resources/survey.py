@@ -43,7 +43,7 @@ class SurveyList(Resource):
         return survey, 201
 
 
-@ns.route("/take/<id>")
+@ns.route("/<id>/take")
 class TakeSurvey(Resource):
     @ns.expect(answer_schema)
     @jwt_required()
@@ -52,7 +52,7 @@ class TakeSurvey(Resource):
         return {}, 200
 
 
-@ns.route("/results/<id>")
+@ns.route("/<id>/results")
 class SurveyResults(Resource):
     @ns.marshal_with(schema)
     @jwt_required()
