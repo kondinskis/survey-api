@@ -58,3 +58,11 @@ class SurveyResults(Resource):
     @jwt_required()
     def get(self, id):
         return SurveyService.results(id)
+
+
+@ns.route("/<id>/publish")
+class SurveyPublish(Resource):
+    @ns.marshal_with(schema)
+    @jwt_required()
+    def put(self, id):
+        return SurveyService.publish(id)

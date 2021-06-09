@@ -51,5 +51,7 @@ schema = ns.model(
         "questions": fields.Nested(question_schema, as_list=True, skip_none=True),
         "tag_ids": fields.List(fields.Integer),
         "tags": fields.Nested(tag_schema, as_list=True, skip_none=True),
+        "published": fields.Boolean(description="Indicates if the survey is published"),
+        "login_required": fields.Boolean(description="Indicates if login is required in order to take survey"),
     },
 )

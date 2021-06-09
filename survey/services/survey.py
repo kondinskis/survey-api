@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from werkzeug.exceptions import NotFound, BadRequest
+from werkzeug.exceptions import NotFound, BadRequest, Conflict
 from sqlalchemy import func
 from survey.extensions import db
 from survey.models.survey import Survey
@@ -19,6 +19,8 @@ class SurveyService:
             active_till=survey.get("active_till"),
             active_from=survey.get("active_from"),
             tags=tags,
+            published=survey.get("published", False),
+            login_required=survey.get("login_required"),
         )
 
         new_survey = new_survey.save(commit=False)
@@ -55,6 +57,7 @@ class SurveyService:
         saved_survey.active_till = survey.get("active_till")
         saved_survey.active_from = survey.get("active_from")
         saved_survey.updated_at = datetime.now(timezone.utc)
+        saved_survey.login_required = survey.get("login_required")
         saved_survey.questions = list(
             map(
                 lambda x: Question(
@@ -101,7 +104,6 @@ class SurveyService:
     @staticmethod
     def get(id):
         survey = Survey.query.get(id)
-        print(survey.questions)
         if survey is None:
             raise NotFound(description=("Survey with id [{0}] not found".format(id)))
         return survey
@@ -147,3 +149,17 @@ class SurveyService:
                 question.total = question.total + option.total
 
         return survey
+
+    @staticmethod
+    def publish(id):
+        survey = Survey.query.get(id)
+        if survey is None:
+            raise NotFound(description=("Survey with id [{0}] not found"))
+
+        if survey.published:
+            raise Conflict(description=("Survey with id [{0}] is already published"))
+
+        survey.published = True
+        survey.update()
+        return survey
+        
