@@ -49,11 +49,16 @@ class SurveyList(Resource):
 
 @ns.route("/<id>/take")
 class TakeSurvey(Resource):
+    @jwt_required(optional=True)
+    def get(self, id):
+        SurveyService.check_take(id)
+        return {}, 200
+
     @ns.expect(answer_schema)
     @jwt_required(optional=True)
     def post(self, id):
         SurveyService.take(id, ns.payload["answers"])
-        return {}, 200
+        return {}, 201
 
 
 @ns.route("/<id>/results")

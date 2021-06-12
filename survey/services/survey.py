@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
-from werkzeug.exceptions import NotFound, BadRequest, Conflict
+from werkzeug.exceptions import NotFound, BadRequest, Conflict, Forbidden
 from sqlalchemy import func
+from flask_jwt_extended import current_user
 from survey.extensions import db
 from survey.models.survey import Survey
 from survey.models.question import Question
@@ -113,11 +114,33 @@ class SurveyService:
         return Survey.query.all()
 
     @staticmethod
+    def check_take(id):
+        survey = Survey.query.get(id)
+        if survey is None:
+            raise NotFound(description=("Survey with id [{0}] not found".format(id)))
+
+        if survey.login_required and not current_user:
+            raise Forbidden(description=("To take this survey you must login first"))
+
+        if current_user in survey.users:
+            raise Conflict(description=("You have already taken this survey"))
+
+    @staticmethod
     def take(id, answers):
         survey = Survey.query.get(id)
         if survey is None:
             raise NotFound(description=("Survey with id [{0}] not found".format(id)))
 
+        if survey.login_required and not current_user:
+            raise Forbidden(description=("In order to take this survey you must login first"))
+
+        if current_user in survey.users:
+            raise Conflict(description=("You have already taken this survey"))
+
+        if current_user:
+            survey.users.append(current_user)
+            survey.save()
+        
         for answer in answers:
             new_answer = Answer(
                 survey_id=id,

@@ -11,6 +11,13 @@ tags = db.Table(
 )
 
 
+users = db.Table(
+    "survey_users",
+    db.Column("user_id", db.Integer, db.ForeignKey("user.id"), primary_key=True),
+    db.Column("survey_id", db.Integer, db.ForeignKey("survey.id"), primary_key=True),
+)
+
+
 class Survey(Base):
     __tablename__ = "survey"
 
@@ -23,6 +30,9 @@ class Survey(Base):
     )
     tags = db.relationship(
         "Tag", secondary=tags, lazy="subquery", backref=db.backref("surveys", lazy=True)
+    )
+    users = db.relationship(
+        "User", secondary=users, lazy="subquery", backref=db.backref("surveys", lazy=True)
     )
     published = db.Column(db.Boolean())
     login_required = db.Column(db.Boolean())
