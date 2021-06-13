@@ -4,7 +4,13 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 
-api = Api(version="0.0.1", title="Survey", description="Survey API", validate=True, doc="/swagger")
+api = Api(
+    version="0.0.1",
+    title="Survey",
+    description="Survey API",
+    validate=True,
+    doc="/swagger",
+)
 db = SQLAlchemy()
 migrate = Migrate()
 cors = CORS()

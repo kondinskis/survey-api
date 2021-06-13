@@ -6,6 +6,8 @@ from .base import Base
 
 
 class Answer(Base):
+    """Answer docstring"""
+
     __tablename__ = "answer"
 
     survey_id = db.Column(db.Integer, db.ForeignKey("survey.id"))

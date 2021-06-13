@@ -32,7 +32,10 @@ class Survey(Base):
         "Tag", secondary=tags, lazy="subquery", backref=db.backref("surveys", lazy=True)
     )
     users = db.relationship(
-        "User", secondary=users, lazy="subquery", backref=db.backref("surveys", lazy=True)
+        "User",
+        secondary=users,
+        lazy="subquery",
+        backref=db.backref("surveys", lazy=True),
     )
     published = db.Column(db.Boolean())
     login_required = db.Column(db.Boolean())

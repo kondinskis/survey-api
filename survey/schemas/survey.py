@@ -31,10 +31,15 @@ answer_schema = ns.model(
     "Survey answers schema",
     {
         "answers": fields.Nested(
-            ns.model("Survey answer schema", {
-                "question_id": fields.Integer(description="Question unique id"),
-                "option_id": fields.Integer(description="Option unique id"),
-            }), as_list=True)
+            ns.model(
+                "Survey answer schema",
+                {
+                    "question_id": fields.Integer(description="Question unique id"),
+                    "option_id": fields.Integer(description="Option unique id"),
+                },
+            ),
+            as_list=True,
+        )
     },
 )
 
@@ -52,6 +57,8 @@ schema = ns.model(
         "tag_ids": fields.List(fields.Integer),
         "tags": fields.Nested(tag_schema, as_list=True, skip_none=True),
         "published": fields.Boolean(description="Indicates if the survey is published"),
-        "login_required": fields.Boolean(description="Indicates if login is required in order to take survey"),
+        "login_required": fields.Boolean(
+            description="Indicates if login is required in order to take survey"
+        ),
     },
 )

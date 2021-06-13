@@ -99,7 +99,7 @@ class SurveyService:
         survey = Survey.query.get(id)
         if survey is None:
             raise NotFound(description=("Survey with id [{0}] not found".format(id)))
-        Answer.query.filter(Answer.survey_id==id).delete()
+        Answer.query.filter(Answer.survey_id == id).delete()
         return survey.delete()
 
     @staticmethod
@@ -132,7 +132,9 @@ class SurveyService:
             raise NotFound(description=("Survey with id [{0}] not found".format(id)))
 
         if survey.login_required and not current_user:
-            raise Forbidden(description=("In order to take this survey you must login first"))
+            raise Forbidden(
+                description=("In order to take this survey you must login first")
+            )
 
         if current_user in survey.users:
             raise Conflict(description=("You have already taken this survey"))
@@ -140,12 +142,12 @@ class SurveyService:
         if current_user:
             survey.users.append(current_user)
             survey.save()
-        
+
         for answer in answers:
             new_answer = Answer(
                 survey_id=id,
                 question_id=answer["question_id"],
-                option_id=answer["option_id"]
+                option_id=answer["option_id"],
             )
             new_answer.save()
 
@@ -155,15 +157,26 @@ class SurveyService:
         if survey is None:
             raise NotFound(description=("Survey with id [{0}] not found".format(id)))
 
-        results = db.session.query(Answer.question_id, Answer.option_id, func.count(Answer.option_id)) \
-            .filter_by(survey_id=id) \
-            .group_by(Answer.question_id, Answer.option_id).all()
+        results = (
+            db.session.query(
+                Answer.question_id, Answer.option_id, func.count(Answer.option_id)
+            )
+            .filter_by(survey_id=id)
+            .group_by(Answer.question_id, Answer.option_id)
+            .all()
+        )
 
         for question in survey.questions:
             for option in question.options:
+
                 def get_total():
                     try:
-                        total = next(filter(lambda x: x[0] == question.id and x[1] == option.id, results))
+                        total = next(
+                            filter(
+                                lambda x: x[0] == question.id and x[1] == option.id,
+                                results,
+                            )
+                        )
                         return total[2]
                     except StopIteration:
                         return 0
@@ -185,4 +198,3 @@ class SurveyService:
         survey.published = True
         survey.update()
         return survey
-        
