@@ -7,14 +7,20 @@ from .base import Base
 tags = db.Table(
     "tags",
     db.Column("tag_id", db.Integer, db.ForeignKey("tag.id"), primary_key=True),
-    db.Column("survey_id", db.Integer, db.ForeignKey("survey.id"), primary_key=True),
+    db.Column(
+        "survey_id", db.Integer, db.ForeignKey("survey.id"), primary_key=True
+    ),
 )
 
 
 users = db.Table(
     "survey_users",
-    db.Column("user_id", db.Integer, db.ForeignKey("user.id"), primary_key=True),
-    db.Column("survey_id", db.Integer, db.ForeignKey("survey.id"), primary_key=True),
+    db.Column(
+        "user_id", db.Integer, db.ForeignKey("user.id"), primary_key=True
+    ),
+    db.Column(
+        "survey_id", db.Integer, db.ForeignKey("survey.id"), primary_key=True
+    ),
 )
 
 
@@ -29,7 +35,10 @@ class Survey(Base):
         "Question", backref="survey", cascade="all, delete, delete-orphan"
     )
     tags = db.relationship(
-        "Tag", secondary=tags, lazy="subquery", backref=db.backref("surveys", lazy=True)
+        "Tag",
+        secondary=tags,
+        lazy="subquery",
+        backref=db.backref("surveys", lazy=True),
     )
     users = db.relationship(
         "User",

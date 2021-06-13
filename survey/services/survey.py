@@ -51,7 +51,9 @@ class SurveyService:
     def update(id, survey):
         saved_survey = Survey.query.get(id)
         if saved_survey is None:
-            raise NotFound(description=("Survey with id [{0}] not found".format(id)))
+            raise NotFound(
+                description=("Survey with id [{0}] not found".format(id))
+            )
 
         saved_survey.title = survey.get("title")
         saved_survey.description = survey.get("description")
@@ -98,7 +100,9 @@ class SurveyService:
     def delete(id):
         survey = Survey.query.get(id)
         if survey is None:
-            raise NotFound(description=("Survey with id [{0}] not found".format(id)))
+            raise NotFound(
+                description=("Survey with id [{0}] not found".format(id))
+            )
         Answer.query.filter(Answer.survey_id == id).delete()
         return survey.delete()
 
@@ -106,7 +110,9 @@ class SurveyService:
     def get(id):
         survey = Survey.query.get(id)
         if survey is None:
-            raise NotFound(description=("Survey with id [{0}] not found".format(id)))
+            raise NotFound(
+                description=("Survey with id [{0}] not found".format(id))
+            )
         return survey
 
     @staticmethod
@@ -117,10 +123,14 @@ class SurveyService:
     def check_take(id):
         survey = Survey.query.get(id)
         if survey is None:
-            raise NotFound(description=("Survey with id [{0}] not found".format(id)))
+            raise NotFound(
+                description=("Survey with id [{0}] not found".format(id))
+            )
 
         if survey.login_required and not current_user:
-            raise Forbidden(description=("To take this survey you must login first"))
+            raise Forbidden(
+                description=("To take this survey you must login first")
+            )
 
         if current_user in survey.users:
             raise Conflict(description=("You have already taken this survey"))
@@ -129,11 +139,15 @@ class SurveyService:
     def take(id, answers):
         survey = Survey.query.get(id)
         if survey is None:
-            raise NotFound(description=("Survey with id [{0}] not found".format(id)))
+            raise NotFound(
+                description=("Survey with id [{0}] not found".format(id))
+            )
 
         if survey.login_required and not current_user:
             raise Forbidden(
-                description=("In order to take this survey you must login first")
+                description=(
+                    "In order to take this survey you must login first"
+                )
             )
 
         if current_user in survey.users:
@@ -155,11 +169,15 @@ class SurveyService:
     def results(id):
         survey = Survey.query.get(id)
         if survey is None:
-            raise NotFound(description=("Survey with id [{0}] not found".format(id)))
+            raise NotFound(
+                description=("Survey with id [{0}] not found".format(id))
+            )
 
         results = (
             db.session.query(
-                Answer.question_id, Answer.option_id, func.count(Answer.option_id)
+                Answer.question_id,
+                Answer.option_id,
+                func.count(Answer.option_id),
             )
             .filter_by(survey_id=id)
             .group_by(Answer.question_id, Answer.option_id)
@@ -173,7 +191,8 @@ class SurveyService:
                     try:
                         total = next(
                             filter(
-                                lambda x: x[0] == question.id and x[1] == option.id,
+                                lambda x: x[0] == question.id
+                                and x[1] == option.id,
                                 results,
                             )
                         )
@@ -193,7 +212,9 @@ class SurveyService:
             raise NotFound(description=("Survey with id [{0}] not found"))
 
         if survey.published:
-            raise Conflict(description=("Survey with id [{0}] is already published"))
+            raise Conflict(
+                description=("Survey with id [{0}] is already published")
+            )
 
         survey.published = True
         survey.update()

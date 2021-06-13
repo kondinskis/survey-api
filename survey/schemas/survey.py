@@ -34,8 +34,12 @@ answer_schema = ns.model(
             ns.model(
                 "Survey answer schema",
                 {
-                    "question_id": fields.Integer(description="Question unique id"),
-                    "option_id": fields.Integer(description="Option unique id"),
+                    "question_id": fields.Integer(
+                        description="Question unique id"
+                    ),
+                    "option_id": fields.Integer(
+                        description="Option unique id"
+                    ),
                 },
             ),
             as_list=True,
@@ -53,10 +57,14 @@ schema = ns.model(
         "active_from": fields.DateTime(description="Survey active from"),
         "created_at": fields.DateTime(description="Date of creation"),
         "updated_at": fields.DateTime(description="Date of modification"),
-        "questions": fields.Nested(question_schema, as_list=True, skip_none=True),
+        "questions": fields.Nested(
+            question_schema, as_list=True, skip_none=True
+        ),
         "tag_ids": fields.List(fields.Integer),
         "tags": fields.Nested(tag_schema, as_list=True, skip_none=True),
-        "published": fields.Boolean(description="Indicates if the survey is published"),
+        "published": fields.Boolean(
+            description="Indicates if the survey is published"
+        ),
         "login_required": fields.Boolean(
             description="Indicates if login is required in order to take survey"
         ),

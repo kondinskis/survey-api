@@ -18,7 +18,9 @@ class TagService:
     def update(id, tag):
         saved_tag = Tag.query.get(id)
         if saved_tag is None:
-            raise NotFound(description=("Tag with id [{0}] not found".format(id)))
+            raise NotFound(
+                description=("Tag with id [{0}] not found".format(id))
+            )
 
         saved_tag.title = tag.get("title")
         saved_tag.description = tag.get("description")
@@ -30,14 +32,18 @@ class TagService:
     def delete(id):
         tag = Tag.query.get(id)
         if tag is None:
-            raise NotFound(description=("Tag with id [{0}] not found".format(id)))
+            raise NotFound(
+                description=("Tag with id [{0}] not found".format(id))
+            )
         return tag.delete()
 
     @staticmethod
     def get(id):
         tag = Tag.query.get(id)
         if tag is None:
-            raise NotFound(description=("Tag with id [{0}] not found".format(id)))
+            raise NotFound(
+                description=("Tag with id [{0}] not found".format(id))
+            )
         return tag
 
     @staticmethod

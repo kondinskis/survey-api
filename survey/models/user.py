@@ -17,7 +17,9 @@ class User(Base):
     role = db.relationship("Role")
 
     def hash_password(self, password):
-        hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+        hashed_password = bcrypt.hashpw(
+            password.encode(), bcrypt.gensalt()
+        ).decode()
         self.password_hash = hashed_password
 
     def verify_password(self, password):
