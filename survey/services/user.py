@@ -16,7 +16,9 @@ class UserService:
             raise BadRequest("Missing required field: password")
 
         if role is None:
-            raise NotFound(description=("Role with id[{0}] not found".format(role_id)))
+            raise NotFound(
+                description=("Role with id[{0}] not found".format(role_id))
+            )
 
         new_user = User(
             firstname=user.get("firstname", ""),
@@ -35,11 +37,15 @@ class UserService:
         role = Role.query.get(role_id)
 
         if role is None:
-            raise NotFound(description=("Role with id[{0}] not found".format(role_id)))
+            raise NotFound(
+                description=("Role with id[{0}] not found".format(role_id))
+            )
 
         saved_user = User.query.get(id)
         if saved_user is None:
-            raise NotFound(description=("User with id[{0}] not found".format(id)))
+            raise NotFound(
+                description=("User with id[{0}] not found".format(id))
+            )
 
         saved_user.firstname = user.get("firstname")
         saved_user.lastname = user.get("lastname")
@@ -57,14 +63,18 @@ class UserService:
     def delete(id):
         user = User.query.get(id)
         if user is None:
-            raise NotFound(description=("User with id [{0}] not found".format(id)))
+            raise NotFound(
+                description=("User with id [{0}] not found".format(id))
+            )
         return user.delete()
 
     @staticmethod
     def get(id):
         user = User.query.get(id)
         if user is None:
-            raise NotFound(description=("User with id [{0}] not found".format(id)))
+            raise NotFound(
+                description=("User with id [{0}] not found".format(id))
+            )
         return user
 
     @staticmethod
@@ -75,3 +85,21 @@ class UserService:
     def get_by_email(email):
         user = User.query.filter_by(email=email).one_or_none()
         return user
+
+    @staticmethod
+    def register(user):
+        role = Role.query.filter_by(name="NORMAL").one()
+
+        password = (user.get("password") or "").strip()
+        if not password:
+            raise BadRequest("Missing required field: password")
+
+        new_user = User(
+            firstname=user.get("firstname", ""),
+            lastname=user.get("lastname", ""),
+            email=user.get("email"),
+            role=role,
+        )
+
+        new_user.hash_password(user.get("password"))
+        new_user.save()

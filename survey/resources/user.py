@@ -3,7 +3,7 @@ from flask_jwt_extended import jwt_required, current_user
 
 from survey.namespaces.user import ns
 from survey.services.user import UserService
-from survey.schemas.user import schema
+from survey.schemas.user import schema, register_schema
 from survey.security import allowed_for
 
 
@@ -47,3 +47,11 @@ class UserList(Resource):
     def post(self):
         user = UserService.create(ns.payload)
         return user, 201
+
+
+@ns.route("/register")
+class UserRegister(Resource):
+    @ns.expect(register_schema)
+    def post(self):
+        UserService.register(ns.payload)
+        return {}, 201
