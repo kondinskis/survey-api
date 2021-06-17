@@ -7,7 +7,7 @@ from survey.schemas.tag import schema
 from survey.security import allowed_for
 
 
-@ns.route("/<id>")
+@ns.route("/<int:id>")
 @ns.param("id", "Tag unique identifier")
 class Tag(Resource):
     @ns.marshal_with(schema, skip_none=True)

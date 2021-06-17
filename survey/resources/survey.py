@@ -7,7 +7,7 @@ from survey.schemas.survey import schema, answer_schema
 from survey.security import allowed_for
 
 
-@ns.route("/<id>")
+@ns.route("/<int:id>")
 @ns.param("id", "Survey unique identifier")
 class Survey(Resource):
     @ns.marshal_with(schema, skip_none=True)
@@ -47,7 +47,7 @@ class SurveyList(Resource):
         return survey, 201
 
 
-@ns.route("/<id>/take")
+@ns.route("/<int:id>/take")
 class TakeSurvey(Resource):
     @jwt_required(optional=True)
     def get(self, id):
@@ -61,7 +61,7 @@ class TakeSurvey(Resource):
         return {}, 201
 
 
-@ns.route("/<id>/results")
+@ns.route("/<int:id>/results")
 class SurveyResults(Resource):
     @ns.marshal_with(schema)
     @jwt_required(optional=True)
@@ -69,7 +69,7 @@ class SurveyResults(Resource):
         return SurveyService.results(id)
 
 
-@ns.route("/<id>/publish")
+@ns.route("/<int:id>/publish")
 class SurveyPublish(Resource):
     @ns.marshal_with(schema)
     @jwt_required()

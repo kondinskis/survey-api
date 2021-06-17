@@ -7,7 +7,7 @@ from survey.schemas.user import schema, register_schema
 from survey.security import allowed_for
 
 
-@ns.route("/<id>")
+@ns.route("/<int:id>")
 @ns.param("id", "User unique identifier")
 class User(Resource):
     @ns.marshal_with(schema, skip_none=True)

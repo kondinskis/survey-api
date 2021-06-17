@@ -1,5 +1,7 @@
-from werkzeug.exceptions import NotFound, BadRequest
+from werkzeug.exceptions import NotFound, BadRequest, Conflict
 from datetime import datetime, timezone
+
+from flask_jwt_extended import current_user
 
 from survey.models.user import User
 from survey.models.role import Role
@@ -66,6 +68,10 @@ class UserService:
             raise NotFound(
                 description=("User with id [{0}] not found".format(id))
             )
+
+        if current_user.id == id:
+            raise Conflict(description=("User cannot delete himself"))
+
         return user.delete()
 
     @staticmethod
