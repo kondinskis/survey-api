@@ -1,10 +1,14 @@
-from werkzeug.exceptions import NotFound, BadRequest, Conflict
-from datetime import datetime, timezone
+from werkzeug.exceptions import NotFound, BadRequest, Conflict, Forbidden
+from datetime import datetime, timezone, timedelta
+from secrets import token_urlsafe
 
 from flask_jwt_extended import current_user
 
 from survey.models.user import User
 from survey.models.role import Role
+from survey.models.forgot_password import ForgotPassword
+from survey.extensions import mail
+from survey.message_wrap import MessageWrap
 
 
 class UserService:
@@ -109,3 +113,46 @@ class UserService:
 
         new_user.hash_password(user.get("password"))
         new_user.save()
+
+    @staticmethod
+    def forgot_password(email):
+        user = User.query.filter_by(email=email).one_or_none()
+
+        if user is None:
+            return
+
+        ForgotPassword.query.filter_by(user=user).delete()
+        forgot_password = ForgotPassword(
+            user=user,
+            token=token_urlsafe(),
+            expires_at=datetime.now(timezone.utc) + timedelta(minutes=5),
+        )
+        forgot_password.save()
+
+        msg = MessageWrap(
+            "Survey Password Reset",
+            recipients=[user.email],
+            template="forgot_password",
+            data={
+                "token": forgot_password.token,
+            },
+        )
+        mail.send(msg)
+
+    @staticmethod
+    def set_password(token, password):
+        forgot_password = ForgotPassword.query.filter_by(
+            token=token
+        ).one_or_none()
+
+        if forgot_password is None:
+            raise NotFound(description=("Token {0} not found".format(token)))
+
+        if forgot_password.expires_at < datetime.now(timezone.utc):
+            raise Forbidden(description=("Token {0} expired".format(token)))
+
+        user = forgot_password.user
+        user.hash_password(password)
+        user.save()
+
+        forgot_password.delete()
