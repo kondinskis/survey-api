@@ -1,19 +1,10 @@
-from flask_restx import fields
-from survey.namespaces.forgot_password import ns
+from marshmallow import Schema, fields
 
-forgot_password_request = ns.model(
-    "Forgot password request schema",
-    {
-        "email": fields.String(description="Email", required=True),
-    },
-)
 
-set_password = ns.model(
-    "Set password schema",
-    {
-        "token": fields.String(
-            description="Forgot password token", required=True
-        ),
-        "password": fields.String(description="New password", required=True),
-    },
-)
+class ForgotPasswordSchema(Schema):
+    email = fields.String(required=True, description="Email")
+
+
+class SetPasswordSchema(Schema):
+    token = fields.String(required=True, description="Forgot password token")
+    password = fields.String(required=True, description="New password")

@@ -2,12 +2,12 @@ from flask import Flask
 
 from survey.config import Config
 from survey.extensions import init_extensions, api
-from survey.resources.auth import ns as auth_ns
-from survey.resources.user import ns as user_ns
-from survey.resources.role import ns as role_ns
-from survey.resources.survey import ns as survey_ns
-from survey.resources.tag import ns as tag_ns
-from survey.resources.forgot_password import ns as forgot_password_ns
+from survey.resources.auth import bp as auth_bp
+from survey.resources.user import bp as user_bp
+from survey.resources.role import bp as role_bp
+from survey.resources.survey import bp as survey_bp
+from survey.resources.tag import bp as tag_bp
+from survey.resources.forgot_password import bp as forgot_password_bp
 
 
 def create_app(config=Config):
@@ -16,13 +16,13 @@ def create_app(config=Config):
 
     init_extensions(app)
 
-    api.add_namespace(auth_ns)
-    api.add_namespace(role_ns)
-    api.add_namespace(user_ns)
-    api.add_namespace(survey_ns)
-    api.add_namespace(tag_ns)
-    api.add_namespace(forgot_password_ns)
+    api.register_blueprint(auth_bp, url_prefix="/auth")
+    api.register_blueprint(role_bp, url_prefix="/roles")
+    api.register_blueprint(user_bp, url_prefix="/users")
+    api.register_blueprint(survey_bp, url_prefix="/surveys")
+    api.register_blueprint(tag_bp, url_prefix="/tags")
+    api.register_blueprint(forgot_password_bp, url_prefix="/forgot-password")
 
-    import survey.errors
+    # import survey.errors
 
     return app

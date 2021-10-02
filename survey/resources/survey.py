@@ -1,77 +1,85 @@
-from flask_restx import Resource
+from flask.views import MethodView
+from flask_smorest import Blueprint
 from flask_jwt_extended import jwt_required, current_user
 
-from survey.namespaces.survey import ns
 from survey.services.survey import SurveyService
-from survey.schemas.survey import schema, answer_schema
+from survey.schemas.survey import (
+    AnswerSchema,
+    AnswersListSchema,
+    SurveySchema,
+)
 from survey.security import allowed_for
 
+bp = Blueprint("survey", __name__)
 
-@ns.route("/<int:id>")
-@ns.param("id", "Survey unique identifier")
-class Survey(Resource):
-    @ns.marshal_with(schema, skip_none=True)
-    @ns.expect(schema)
+
+@bp.route("/<int:id>")
+class Survey(MethodView):
+    @bp.arguments(SurveySchema)
+    @bp.response(200, schema=SurveySchema)
     @jwt_required()
     @allowed_for("SYSTEM", "ADMIN")
-    def put(self, id):
-        survey = SurveyService.update(id, ns.payload)
+    def put(self, data, id):
+        survey = SurveyService.update(id, data)
         return survey
 
     @jwt_required()
     @allowed_for("SYSTEM", "ADMIN")
+    @bp.response(204)
     def delete(self, id):
         SurveyService.delete(id), 204
 
-    @ns.marshal_with(schema, skip_none=True)
+    @bp.response(200, schema=SurveySchema)
     @jwt_required(optional=True)
     def get(self, id):
         survey = SurveyService.get(id)
         return survey
 
 
-@ns.route("")
-class SurveyList(Resource):
-    @ns.marshal_list_with(schema, skip_none=True)
+@bp.route("")
+class SurveyList(MethodView):
+    @bp.response(200, schema=SurveySchema(many=True))
     @jwt_required(optional=True)
     def get(self):
         surveys = SurveyService.get_all()
         return surveys
 
-    @ns.marshal_with(schema, skip_none=True)
-    @ns.expect(schema)
+    @bp.arguments(SurveySchema)
+    @bp.response(201, schema=SurveySchema)
     @jwt_required()
     @allowed_for("SYSTEM", "ADMIN")
-    def post(self):
-        survey = SurveyService.create(ns.payload)
+    def post(self, data):
+        survey = SurveyService.create(data)
         return survey, 201
 
 
-@ns.route("/<int:id>/take")
-class TakeSurvey(Resource):
+@bp.route("/<int:id>/take")
+class TakeSurvey(MethodView):
     @jwt_required(optional=True)
+    @bp.response(200)
     def get(self, id):
         SurveyService.check_take(id)
         return {}, 200
 
-    @ns.expect(answer_schema)
+    @bp.arguments(AnswersListSchema)
+    @bp.response(201)
     @jwt_required(optional=True)
-    def post(self, id):
-        SurveyService.take(id, ns.payload["answers"])
+    def post(self, data, id):
+        SurveyService.take(id, data["answers"])
         return {}, 201
 
 
-@ns.route("/<int:id>/results")
-class SurveyResults(Resource):
-    @ns.marshal_with(schema)
+@bp.route("/<int:id>/results")
+class SurveyResults(MethodView):
+    @bp.response(200, schema=SurveySchema)
     @jwt_required(optional=True)
     def get(self, id):
         return SurveyService.results(id)
 
 
-@ns.route("/<int:id>/publish")
-class SurveyPublish(Resource):
-    @ns.marshal_with(schema)
+@bp.route("/<int:id>/publish")
+class SurveyPublish(MethodView):
+    @bp.response(200, schema=SurveySchema)
     @jwt_required()
     @allowed_for("SYSTEM", "ADMIN")
     def put(self, id):
