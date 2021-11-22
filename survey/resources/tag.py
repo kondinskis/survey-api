@@ -1,29 +1,31 @@
-from flask_restx import Resource
+from flask.views import MethodView
+from flask_smorest import Blueprint
 from flask_jwt_extended import jwt_required, current_user
 
-from survey.namespaces.tag import ns
 from survey.services.tag import TagService
-from survey.schemas.tag import schema
+from survey.schemas.tag import TagSchema
 from survey.security import allowed_for
 
+bp = Blueprint("tag", __name__)
 
-@ns.route("/<int:id>")
-@ns.param("id", "Tag unique identifier")
-class Tag(Resource):
-    @ns.marshal_with(schema, skip_none=True)
-    @ns.expect(schema)
+
+@bp.route("/<int:id>")
+class Tag(MethodView):
+    @bp.arguments(TagSchema)
+    @bp.response(200, schema=TagSchema)
     @jwt_required()
     @allowed_for("SYSTEM", "ADMIN")
-    def put(self, id):
-        tag = TagService.update(id, ns.payload)
+    def put(self, data, id):
+        tag = TagService.update(id, data)
         return tag
 
     @jwt_required()
     @allowed_for("SYSTEM", "ADMIN")
+    @bp.response(204)
     def delete(self, id):
         TagService.delete(id), 204
 
-    @ns.marshal_with(schema, skip_none=True)
+    @bp.response(200, schema=TagSchema)
     @jwt_required()
     @allowed_for("SYSTEM", "ADMIN")
     def get(self, id):
@@ -31,19 +33,19 @@ class Tag(Resource):
         return tag
 
 
-@ns.route("")
-class TagList(Resource):
-    @ns.marshal_list_with(schema, skip_none=True)
+@bp.route("")
+class TagList(MethodView):
+    @bp.response(200, schema=TagSchema(many=True))
     @jwt_required()
     @allowed_for("SYSTEM", "ADMIN")
     def get(self):
         tags = TagService.get_all()
         return tags
 
-    @ns.marshal_with(schema, skip_none=True)
-    @ns.expect(schema)
+    @bp.arguments(TagSchema)
+    @bp.response(200, schema=TagSchema)
     @jwt_required()
     @allowed_for("SYSTEM", "ADMIN")
-    def post(self):
-        tag = TagService.create(ns.payload)
+    def post(self, data):
+        tag = TagService.create(data)
         return tag, 201

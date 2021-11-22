@@ -1,29 +1,35 @@
-from flask_restx import Resource
+from flask.views import MethodView
+from flask_smorest import Blueprint
 from flask_jwt_extended import jwt_required, current_user
 
-from survey.namespaces.user import ns
 from survey.services.user import UserService
-from survey.schemas.user import schema, register_schema
+from survey.schemas.user import (
+    UserInSchema,
+    UserOutSchema,
+)
 from survey.security import allowed_for
 
 
-@ns.route("/<int:id>")
-@ns.param("id", "User unique identifier")
-class User(Resource):
-    @ns.marshal_with(schema, skip_none=True)
-    @ns.expect(schema)
+bp = Blueprint("user", __name__)
+
+
+@bp.route("/<int:id>")
+class User(MethodView):
+    @bp.arguments(UserInSchema)
+    @bp.response(200, schema=UserOutSchema)
     @jwt_required()
     @allowed_for("SYSTEM", "ADMIN")
-    def put(self, id):
-        user = UserService.update(id, ns.payload)
+    def put(self, data, id):
+        user = UserService.update(id, data)
         return user
 
     @jwt_required()
     @allowed_for("SYSTEM", "ADMIN")
+    @bp.response(204)
     def delete(self, id):
         UserService.delete(id), 204
 
-    @ns.marshal_with(schema, skip_none=True)
+    @bp.response(200, schema=UserOutSchema)
     @jwt_required()
     @allowed_for("SYSTEM", "ADMIN")
     def get(self, id):
@@ -31,27 +37,28 @@ class User(Resource):
         return user
 
 
-@ns.route("")
-class UserList(Resource):
-    @ns.marshal_list_with(schema, skip_none=True)
+@bp.route("")
+class UserList(MethodView):
+    @bp.response(200, schema=UserOutSchema(many=True))
     @jwt_required()
     @allowed_for("SYSTEM", "ADMIN")
     def get(self):
         users = UserService.get_all()
         return users
 
-    @ns.marshal_with(schema, skip_none=True)
-    @ns.expect(schema)
+    @bp.arguments(UserOutSchema)
+    @bp.response(201, schema=UserOutSchema)
     @jwt_required()
     @allowed_for("SYSTEM", "ADMIN")
-    def post(self):
-        user = UserService.create(ns.payload)
+    def post(self, data):
+        user = UserService.create(data)
         return user, 201
 
 
-@ns.route("/register")
-class UserRegister(Resource):
-    @ns.expect(register_schema)
+@bp.route("/register")
+class UserRegister(MethodView):
+    @bp.arguments(UserInSchema)
+    @bp.response(201)
     def post(self):
         UserService.register(ns.payload)
         return {}, 201

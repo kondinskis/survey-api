@@ -1,4 +1,5 @@
-from flask_restx import Resource
+from flask.views import MethodView
+from flask_smorest import Blueprint
 
 from werkzeug.exceptions import Unauthorized
 from flask_jwt_extended import (
@@ -9,8 +10,10 @@ from flask_jwt_extended import (
 )
 
 from survey.services.user import UserService
-from survey.namespaces.auth import ns
-from survey.schemas.auth import token_request_schema, token_schema
+from survey.schemas.auth import (
+    TokenRequestSchema,
+    TokenSchema,
+)
 from survey.extensions import jwt
 
 
@@ -30,18 +33,21 @@ def user_lookup_callback(_jwt_header, jwt_data):
     return user
 
 
-@ns.route("/token")
-class AccessToken(Resource):
-    @ns.marshal_with(token_schema, skip_none=True)
-    @ns.expect(token_request_schema)
-    def post(self):
+bp = Blueprint("auth", __name__)
 
-        user = UserService.get_by_email(ns.payload["email"])
+
+@bp.route("/token")
+class AccessToken(MethodView):
+    @bp.arguments(TokenRequestSchema)
+    @bp.response(200, schema=TokenSchema)
+    def post(self, data):
+
+        user = UserService.get_by_email(data["email"])
 
         if user is None:
             raise Unauthorized(description="Wrong email or password")
 
-        if not user.verify_password(ns.payload["password"]):
+        if not user.verify_password(data["password"]):
             raise Unauthorized(description="Wrong email or password")
 
         ret = {
@@ -51,9 +57,9 @@ class AccessToken(Resource):
         return ret
 
 
-@ns.route("/refresh")
-class RefreshToken(Resource):
-    @ns.marshal_with(token_schema, skip_none=True)
+@bp.route("/refresh")
+class RefreshToken(MethodView):
+    @bp.response(200, schema=TokenSchema)
     @jwt_required(refresh=True)
     def post(self):
         ret = {"access_token": create_access_token(identity=current_user)}

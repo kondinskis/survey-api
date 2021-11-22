@@ -1,12 +1,6 @@
-from flask_restx import fields
-from survey.namespaces.role import ns
+from marshmallow import Schema, fields
 
-schema = ns.model(
-    "Role schema",
-    {
-        "id": fields.Integer(
-            readOnly=True, description="The role unique identifier"
-        ),
-        "name": fields.String(description="Name"),
-    },
-)
+
+class RoleSchema(Schema):
+    id = fields.Integer(description="The role unique identifier")
+    name = fields.String(description="Name")

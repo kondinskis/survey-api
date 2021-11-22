@@ -1,25 +1,29 @@
-from flask_restx import Resource
+from flask.views import MethodView
+from flask_smorest import Blueprint
 from flask_jwt_extended import jwt_required, current_user
 
-from survey.namespaces.forgot_password import ns
 from survey.schemas.forgot_password import (
-    forgot_password_request,
-    set_password,
+    ForgotPasswordSchema,
+    SetPasswordSchema,
 )
 from survey.services.user import UserService
 
+bp = Blueprint("forgot_password", __name__)
 
-@ns.route("")
-class ForgotPassword(Resource):
-    @ns.expect(forgot_password_request)
-    def post(self):
-        UserService.forgot_password(ns.payload["email"])
+
+@bp.route("")
+class ForgotPassword(MethodView):
+    @bp.arguments(ForgotPasswordSchema)
+    @bp.response(201)
+    def post(self, data):
+        UserService.forgot_password(data["email"])
         return {}, 201
 
 
-@ns.route("/set")
-class SetPassword(Resource):
-    @ns.expect(set_password)
-    def post(self):
-        UserService.set_password(ns.payload["token"], ns.payload["password"])
+@bp.route("/set")
+class SetPassword(MethodView):
+    @bp.arguments(SetPasswordSchema)
+    @bp.response(200)
+    def post(self, data):
+        UserService.set_password(data["token"], data["password"])
         return {}, 200
